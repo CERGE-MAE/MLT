@@ -66,6 +66,8 @@ tags %>% summary
 # Reminder: Using notation %<>% we UPDATE LHS using a function on RHS
 #
 tags$timestamp %<>% as.POSIXct(origin = "1970-01-01")
+# same as previous line!
+# tags$timestamp = tags$timestamp %>% as.POSIXct(origin = "1970-01-01") 
 
 # Next line does the same withou pipes
 # tags$timestamp = as.POSIXct(tags$timestamp,origin = "1970-01-01")
@@ -136,7 +138,7 @@ movies %>%
     filter(title == "War of the Worlds (2005)")
 
 ## set for later
-reset_ID = function(ids){
+reset_ID = function(ids) {
     ids[ids == "65665"] = "3598"
     ids[ids == "64997"] = "34048"
     return(ids)
@@ -157,7 +159,7 @@ movies$genres %>%
 
 ## helper function :
 #  take the string with genres -> split genres by symbol "|" -> indicate genres
-set_genre = function(x){
+set_genre = function(x) {
     x %>% 
         strsplit("\\|") %>% 
         unlist -> 
@@ -252,7 +254,7 @@ if (!require(class)) {
 }
 
 # Join movies and ratings from the user
-movies547 = left_join(movies,rat547[,c("movieId","class")])
+movies547 = left_join(movies, rat547[,c("movieId","class")])
 colnames(movies547)
 
 # Define train and test data.
@@ -262,7 +264,7 @@ moviesTest = movies547 %>% filter(is.na(class))
 
 #--- 2.2 CROSS-VALIDATION: FIND THE RIGHT "k" ---------------------------------
 set.seed(1234)
-indexTrain1 = sample(1:nrow(moviesTrain),1500)
+indexTrain1 = sample(1:nrow(moviesTrain), 1500)
 
 moviesTrain1 = moviesTrain[indexTrain1,]
 moviesTrain2 = moviesTrain[-indexTrain1,]
@@ -294,10 +296,9 @@ rm(result, moviesTrain1, moviesTrain2, indexTrain1, i)
 moviesTest$new =
     knn(moviesTrain[,4:22], moviesTest[,4:22], moviesTrain[,"class"], k)
 
-
 movies547[,4:22] %>% map_dbl(mean) %>% .[order(., decreasing = T)]
 
-movies547[moviesTest$new == 1,4:22] %>%
+moviesTest[moviesTest$new == 1,4:22] %>%
     map_dbl(mean) %>%
     .[order(., decreasing = T)]
 
@@ -347,7 +348,6 @@ user = 287
 ## Select just user movies
 ratings %>% 
     filter(userId == user, rating > 4) %>% 
-    select(movieId) %>% 
     pull(movieId) -> userMov
 
 ## find movies in matrix and filter
@@ -359,7 +359,7 @@ apply(itemChoice, 1, which.max) %>% table -> bestPicks
 bestPicks
 
 ## find the best recommendation
-bestPicks %>% which.max() %>% rownames(bestPicks)[.] -> no1
+bestPicks %>% which.max() %>% names(bestPicks)[.] -> no1
 movies %>% 
     filter(movieId == no1)
 
@@ -374,7 +374,6 @@ movies %>%
     filter(movieId %in% userMov) %>% View()
 
 ratings[ratings$userId == user & ratings$movieId == no1,]
-
 
 rm(ratMR, item, userMov, indexCR, itemChoice, bestPicks, no1, user)
 
@@ -394,7 +393,7 @@ bestPicks
 index = which.max(cumsum(bestPicks) >= 10)
 names(bestPicks) %>% as.numeric() %>% .[seq_len(index)] -> index
 
-user[userID,] %in% index %>% which() %>% rownames(user)[.] -> userSim
+user[userID,][user[userID,] >= names(index)] %>% names() -> userSim
 
 ## movies watched by similar users 
 (ratings %>% 
