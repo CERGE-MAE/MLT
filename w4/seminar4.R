@@ -1,7 +1,7 @@
 #####################
 ## Seminar 4       ##
 ## Michal Kubista  ##
-## 27 January 2020 ##
+## 27 January 2021 ##
 #####################
 
 install_and_load = function(name, char = T){
@@ -103,9 +103,9 @@ set.seed(12345)
 ### - compute total within-cluster sum of squared errors (SSE)
 ### - choose the small k-value with small SSE
 
-inter = c()
+inter = rep(0, 10)
 for (i in 1:10) {
-    inter = c(inter, kmeans(wholeC[,-1:-2],i)$tot.withinss)
+    inter[i] = kmeans(wholeC[,-1:-2],i)$tot.withinss
     
 }
 
@@ -165,7 +165,11 @@ groups %>% table
 ggplot(wholeC, aes(x = Channel, y = Region, color = as.factor(groups))) +
     geom_jitter()
 
+wholeC$clust = groups
+
+wholeC %>% 
+  split(.$clust) %>% 
+  map(~table(.x[,.(Channel, Region)]))
+
 clusplot(wholeC[,-1:-2], groups , color = TRUE, 
          shade = T, labels = 1, lines = 0)
-
-rm(list = ls())
