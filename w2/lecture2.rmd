@@ -164,8 +164,8 @@ $$lift(X \Rightarrow Y) = \frac{supp(X \cup Y)}{supp(X) * supp (Y)} $$
     + compared to independent events
         + **P(A) * P(B)**
     
-$$conf(X \Rightarrow Y) = P(Y|X) = \frac{P(Y) \cap P(X)}{P(X)}$$
-$$lift(X \Rightarrow Y) = \frac{P(Y) \cap P(X)}{P(X) * P(Y)}$$
+$$conf(X \Rightarrow Y) = P(Y|X) = \frac{P(Y \cap X)}{P(X)}$$
+$$lift(X \Rightarrow Y) = \frac{P(Y \cap X)}{P(X) * P(Y)}$$
 
 ## Apriori summary
 - find frequent itemsets
