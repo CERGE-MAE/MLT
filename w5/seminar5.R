@@ -1,7 +1,7 @@
 #####################
 ## Seminar 5       ##
 ## Michal Kubista  ##
-## 10 February 2020##
+## 5 February 2021 ##
 #####################
 
 # install.packages("rpart")
@@ -16,11 +16,15 @@ sapply(
 #-- PART 1 - BASKET ANALYSIS BASICS ############################################
 
 #--- 1.1 ETL -------------------------------------------------------------------
-# data from https://community.tableau.com/docs/DOC-1236
-url = "https://community.tableau.com/servlet/JiveServlet/downloadBody/1236-102-2-15278/Sample%20-%20Superstore.xls"
+if (!dir.exists("w5/data")) {
 dir.create("w5/data")
-download.file(url, "w5/data/transac.xls", mode = "wb")
-rm(url)
+}
+# data from https://community.tableau.com/docs/DOC-1236
+# doesn't work anymore :(
+# url = "https://community.tableau.com/servlet/JiveServlet/downloadBody/1236-102-2-15278/Sample%20-%20Superstore.xls"
+# download.file(url, "w5/data/transac.xls", mode = "wb")
+# rm(url)
+# download from https://drive.google.com/drive/folders/1M1nsc282Eoi_ax_O6piuDrWjYcxwAZWl?usp=sharing
 
 raw = read_excel("w5/data/transac.xls") %>% as.data.table()
 ## ID coercing
@@ -58,7 +62,7 @@ loc$zip %>% unique() %>% length()
 nrow(loc)
 
 loc[duplicated(loc$zip),zip] %>% 
-    filter(.data = loc, zip == .)
+    {filter(.data = loc, zip == .)}
 
 loc[zip == "92024" & city == "Encinitas", zip := 92028]
 
@@ -125,7 +129,7 @@ ggplot(bas[order(bas$promoC),], aes(x = 1:nrow(bas), y = promoC)) +
     geom_line()
 
 ### analyse the periodicity on nopromo baskets ####
-np_bas =  bas[promoC == 0]                       #
+np_bas =  bas[promoC == 0]                        #
 np_bas$cust_ID %>% unique %>% length              #
                                                   #
 np_bas$cust_ID %>%                                #
@@ -150,7 +154,9 @@ ggplot(bas, aes(x = as.factor(noSKU), y = items)) +
     geom_boxplot()
 
 ggplot(bas, aes(x = noSKU, y = items)) +
-    geom_jitter(width = 0.5, height = 0.6)
+    geom_jitter(width = 0.5, height = 0.6) +
+    geom_smooth(method = "lm")
+
 
 ## daily visits
 bas[,
@@ -202,7 +208,7 @@ custStats %>% summary()
     
 custStatsS = custStats[,-1]
 custStatsS = apply(custStatsS, 2, scale)
-rownames(custStatsS) = custStats[,1]
+rownames(custStatsS) = custStats$cust_ID
 
 ## kmeans
 set.seed(123)
