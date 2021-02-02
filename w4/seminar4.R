@@ -4,7 +4,7 @@
 ## 27 January 2021 ##
 #####################
 
-install_and_load = function(name, char = T){
+install_and_load = function(name, char = T) {
   if (!require(name, character.only = char)) {
     install.packages(name)
   }
@@ -13,7 +13,7 @@ install_and_load = function(name, char = T){
 
 sapply(
     c("data.table","dplyr","magrittr","ggplot2",
-      "purrr", "GGally", "cluster", "readxl", "tidyr"),
+      "purrr", "GGally", "cluster"),
     install_and_load
 )
 
