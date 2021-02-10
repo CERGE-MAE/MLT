@@ -157,10 +157,9 @@ ggplot(bas, aes(x = noSKU, y = items)) +
     geom_jitter(width = 0.5, height = 0.6) +
     geom_smooth(method = "lm")
 
-
 ## daily visits
 bas[,
-    day := format(date,"%u")
+    day := format(date, "%u")
     ][,
       promoG := ifelse(promoC > 0.5, 1, 0)
     ][,
@@ -242,7 +241,7 @@ prod$cat %>% table
 prodStats[prod[,.(prod_ID, cat)], on = "prod_ID"
           ][,furn := ifelse(cat == "Furniture", 1, 0)
             ][,tech := ifelse(cat == "Technology", 1, 0)
-              ][!duplicated(prod_ID), !"cat"] -> prodStats
+              ][!duplicated(prod_ID), -"cat"] -> prodStats
 
 ## matrix and scale
 rownames(prodStats) = prodStats$prod_ID
@@ -285,10 +284,9 @@ table(prodStats$group)
 
 tree = rpart(as.factor(group)~., prodStats[,-1])
 fancyRpartPlot(tree)
-tree$variable.importance / sum(tree$variable.importance)
 
 ## which customers which items?
-custStats %<>% as.data.table() 
+custStats %<>% as.data.table()
 pur[custStats[,.(cust_ID, custG = group)], on = "cust_ID"
     ][prodStats[,.(prod_ID, prodG = group)], on = "prod_ID"] -> purGrp
 
