@@ -1,7 +1,7 @@
 #####################
 ## Seminar 6       ##
 ## Michal Kubista  ##
-## 17 February 2020##
+## 10 February 2021##
 #####################
 
 install_and_load = function(name, char = T){
@@ -18,9 +18,7 @@ sapply(
 
 #-- PART 1 - SIMPLE PRICINGS ###################################################
 #--- 1.1 ETL -------------------------------------------------------------------
-# download data from 
-# https://drive.google.com/open?id=1b6UZijHw-xN6dIPTq2RCu3WbmScHkg95
-# into w2/data
+# use data from w2 
 transRaw =
   as.data.table(read_xlsx("w2/data/online_retail.xlsx"))
 
@@ -114,10 +112,11 @@ trans[base, on = "StockCode"
 
 ## create pene table
 ## runs ~ 114 linear models
-pene_table = trans[StockCode %in% hh_items,
+pene_table = trans[StockCode %in% hh_items$StockCode,
                    .(elas = lm(log(Quantity)~log(UnitPrice))$coefficients[2]),
                    by = .(StockCode, promo)
                    ][order(elas, decreasing = T)]
+
 
 ## long to wide
 pene_table %>% 
