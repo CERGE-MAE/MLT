@@ -4,7 +4,7 @@
 ## 10 February 2021##
 #####################
 
-install_and_load = function(name, char = T){
+install_and_load = function(name, char = T) {
   if (!require(name, character.only = char)) {
     install.packages(name)
   }
@@ -75,10 +75,10 @@ find_price_index = function(code, day) {
 
 ## find price indexes for given day
 ## create table of price indexes
-sapply(prodID, find_price_index, day = "2011-12-05") -> pi_table
+map_dbl(prodID, find_price_index, day = "2011-12-05") -> pi_table
 
 ## transform to data.table and group indexes
-pi_table = data.table(StockCode = names(pi_table), pi = pi_table)[!is.na(pi)]
+pi_table = data.table(StockCode = prodID, pi = pi_table)[!is.na(pi)]
 pi_table[, piG := ifelse(pi > 0.9, ifelse(pi > 1.1, "H", "M"),"L")]
 summary(as.factor(pi_table$piG))
 
@@ -142,7 +142,7 @@ pene_table %>%
 pie_table %>% filter(StockCode == "22608")
 
 trans %>% 
-  filter(StockCode == "22608") -> SKU
+  filter(StockCode == "84970L") -> SKU
 
 ggplot(SKU, aes(x = UnitPrice, y = Quantity, color = as.factor(promo))) +
   geom_line() +
@@ -152,4 +152,3 @@ ggplot(SKU, aes(x = UnitPrice, y = Quantity, color = as.factor(promo))) +
 ggplot(SKU, aes(x = InvoiceDate, y = UnitPrice, color = as.factor(promo))) +
   geom_line() +
   geom_point()
-
