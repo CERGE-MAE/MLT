@@ -10,8 +10,9 @@ w2/data/
 w3/data/
 w4/lecture4_files/figure-html/
 w5/lecture5_files/figure-html/
-w7/lecture7_files/figure-html/
 w5/data
+w7/lecture7_files/figure-html/
 *_cache/
 *.pdf
+*.png
 .tmp.drivedownload
