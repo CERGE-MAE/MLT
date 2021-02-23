@@ -1,7 +1,7 @@
 ---
 title: "Lecture 7"
 author: "Michal Kubi&#353;ta"
-date: "24 February 2020"
+date: "24 February 2021"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -75,36 +75,6 @@ library(inTrees)
 - CHAID
 - MARS
 
-## Gini coefficient
-- first we label the observation randomly
-    - with regard to the original proportions in the data
-- we choose observation randomly
-- what is the probability it is incorrectly classified?
-
-$$G(p) = \sum_{i=1}^{J}p_{i} \sum_{k \neq i}p_{k} = \sum_{i=1}^{J}p_{i}*(1-p_{i}) = \sum_{i=1}^{J}p_{i} - \sum_{i=1}^{J}p_{i}^{2}$$
-
-## Entropy function
-
-```{r entropy, echo = FALSE}
-ex = seq(0.05, 0.95, by = 0.05)
-ey = -ex * log(ex, 2) - (1 - ex) * log(1 - ex, 2)
-en = data.frame(ex,ey)
-ggplot(en, aes(ex,ey)) +
-    geom_point(size = 2) +
-    geom_line() +
-    scale_x_continuous(limits = c(0,1), breaks = seq(0,1, by = 0.25))
-    
-```
-
-## Entropy & InfoGain
-- information entropy
-
-$$E = -\sum_{i=1}^{J}p_{i}log_{2}p_{i}$$
-
-- information gain
-
-$$IG_{k} = E_{k-1} - \sum_{s}^{S}\frac{n_{s}}{n}E_{s}$$
-
 ## MARS
 
 ```{r MARS_prepare, echo = F}
@@ -156,6 +126,39 @@ $$\hat f(x) = \sum_{i}^{k} c_{i}B_{i}(x)$$
     - constant $1$
     - hinge function ($max(0, x - const)$ or $max(0, const - x)$)
     - product of hinge functions
+
+## Inpurity function
+
+```{r entropy, echo = FALSE}
+ex = seq(0.005, 0.995, by = 0.01)
+ey = -ex * log(ex, 2) - (1 - ex) * log(1 - ex, 2)
+en = data.frame(ex,ey)
+ggplot(en, aes(ex,ey)) +
+    geom_point(size = 1) +
+    geom_line() +
+    scale_x_continuous(name = "P(class=1)", limits = c(0,1), breaks = seq(0,1, by = 0.25)) +
+    scale_y_continuous(name = "Inpurity", limits = c(0,1))
+    
+    
+```
+
+## Gini coefficient
+- first we label the observation randomly
+    - with regard to the original proportions in the data
+- we choose observation randomly
+- what is the probability it is incorrectly classified?
+
+$$G(p) = \sum_{i=1}^{J}p_{i} \sum_{k \neq i}p_{k} = \sum_{i=1}^{J}p_{i}*(1-p_{i}) = \sum_{i=1}^{J}p_{i} - \sum_{i=1}^{J}p_{i}^{2}$$
+
+
+## Entropy & InfoGain
+- information entropy
+
+$$E = -\sum_{i=1}^{J}p_{i}log_{2}(p_{i})$$
+
+- information gain
+
+$$IG_{k} = E_{k-1} - \sum_{s}^{S}\frac{n_{s}}{n}E_{s}$$
 
 ## Trees
 - classification & regression

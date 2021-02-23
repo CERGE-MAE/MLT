@@ -1,10 +1,10 @@
 ######################
 ## Seminar 7        ##
 ## Michal Kubista   ##
-## 24 February 2020 ##
+## 24 February 2021 ##
 ######################
 
-install_and_load = function(name, char = T){
+install_and_load = function(name, char = T) {
   if (!require(name, character.only = char)) {
     install.packages(name)
   }
@@ -14,7 +14,7 @@ install_and_load = function(name, char = T){
 sapply(
     c("data.table","tidyverse","magrittr", "GGally",
       "rpart", "rattle", "randomForest", "forestFloor",
-      "caret","randomForestExplainer"),
+      "caret"),
     install_and_load
 )
 
@@ -64,6 +64,7 @@ tree$cptable
 
 ## prune tree (1 SE rule)
 tree_pruned = prune(tree, 0.00372882)
+tree_pruned = prune(tree, 0.00474577)
 fancyRpartPlot(tree_pruned)
 
 ## trees train accuracy
@@ -129,11 +130,9 @@ errors
 which.max(errors)
 
 ## "best" forest visualisation
-rf = randomForest(Churn ~ ., train[,-1], mtry = 5, importance = TRUE,
+rf = randomForest(Churn ~ ., train[,-1], mtry = 4, importance = TRUE,
                   keep.inbag = T, ntrees = 2000)
 rf$importance
 
 ff <- forestFloor(rf, train[,-1], binary_reg = T)
 plot(ff, col = fcol(ff, 1), plot_seq = 1:6)
-
-explain_forest(rf, interactions = TRUE, data = train)
