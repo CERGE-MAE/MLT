@@ -29,8 +29,7 @@ knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "mp4",
     - layers
         - input, hidden, output
     - bias, weights, activation function
-- similar to linear regression
-    - master of feature engineering (... PCA)
+- masters of feature engineering (... PCA)
     
 ## Types
 
@@ -210,7 +209,7 @@ $$f(x) = \begin{cases} 0 & \text{if $x < 0$} \\ x & \text{if $x \ge 0$} \end{cas
     - OLS, logit, probit, mixed effect models, etc
 - find the set of parameters to maximise the likelihood function
 
-$$L(Y, X, \beta, \sigma) = \prod_{i=1}^{N} P(Y = y_{i} | X = x_{i}, \mu, \sigma) =$$
+$$L(Y, X, \beta, \sigma) = \prod_{i=1}^{N} P(Y = y_{i} | X = x_{i}, \beta, \sigma) =$$
 $$= \prod_{i=1}^{N} \frac{1}{\sqrt(2\pi\sigma^2)}exp(-\frac{(y_{i} -\beta_{0} -\beta_{1}x_{i} )^2}{2\sigma^2})$$
 
 ## Bagging & Boosting
