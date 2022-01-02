@@ -1,7 +1,7 @@
 ---
 title: "Lecture 1"
 author: "Michal Kubi&#353;ta"
-date: "6 January 2021"
+date: "3 January 2022"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -23,15 +23,15 @@ library(ggplot2)
 
 ## About me
 - Michal Kubi&#353;ta
-- Main focus: European FMCG retail market
-- Contact: michal.kubista@nielsen.com
+- Main focus: European FMCG retail market (former)
+- Contact: kubistmi@gmail.com
 - Office hours: upon prior arrangment 
 - I'm bad with names ... *sorry*
-- <font color = "orange">**please include string "MLT2021" in your email subject** </font>
+- <font color = "orange">**please include string "MLT2022" in your email subject** </font>
 
 ## Organization
-- Wednesday: 16:15 - 19:30
-- Friday: 9:30 - 11:00
+- Monday: 15:45 - 19:00
+- Wednesday: 17:30 - 19:00
     - additional seminar used to wrap up more complex topics
     - otherwise can be used for consultations
 
@@ -125,7 +125,7 @@ library(ggplot2)
 - download the slides (sources)
 - should you find any mistke in the materials
     + suggest edit via pull request
-- submit done via [Github classroom](https://classroom.github.com/a/cQSDmmhK)
+- submit done via [Github classroom](https://classroom.github.com/a/nKg_vuUj)
 
 ##  {.flexbox .vcenter}
 

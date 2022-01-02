@@ -1,7 +1,7 @@
 ####################
 ## Seminar 1      ##
 ## Michal Kubista ##
-## 6 January 2021 ##
+## 3 January 2022 ##
 ####################
 
 purrr::map_lgl(
@@ -62,6 +62,7 @@ auction_Names = function() {
 }
 
 #---- 1.1.1 FOR LOOP ----------------------------------------------------------
+
 auction_Names()
 
 input = list()
@@ -80,6 +81,8 @@ rm(input, inputTable, i)
 
 input = lapply(auction_Names(), read.csv)
 inputTable = do.call(rbind.data.frame, input)
+
+#---- 1.1.2. PURRR ------------------------------------------------------------
 
 inputTable = purrr::map_df(auction_Names(), read.csv)
 
@@ -115,10 +118,7 @@ rm(dtNames, dtTable, auction_Names)
 # rm(auction, auctionTable, priceTable, itemTable, dtOut)
 #----
 
-inFileNames = 
-  list.files(path2data) %>%
-  grep("Table",.) %>%
-  list.files(path2data, full.names = TRUE)[.]
+inFileNames = list.files(path2data, "Table", full.names = T)
 inFileNames
 
 #---- 1.2.1 DATA.TABLE JOIN --------------------------------------------------
@@ -247,12 +247,12 @@ GGally::ggpairs(auction[,colSelect])
 
 #--- 3.3 ORLY?
 url =
-  "http://www4.stat.ncsu.edu/~stefanski/NSF_Supported/Hidden_Images/orly_owl_files/orly_owl_Lin_4p_5_flat.txt"
+  "http://www4.stat.ncsu.edu/~stefansk/NSF_Supported/Hidden_Images/orly_owl_files/orly_owl_Lin_4p_5_flat.txt"
 
 orly = read.table(url, header = FALSE)
+GGally::ggpairs(orly)
 
 fit = lm(V1 ~ . - 1, data = orly)
-
 summary(fit)
 
 orlyRes = data.frame(fitted = fit$fitted.values, resid = fit$residuals)

@@ -1,8 +1,6 @@
-# Machine Learning Techniques 2021
-This repository contains all lectures and seminars for Machine Learning Techniques course taught in 2021 by Michal Kubišta on CERGE-EI.
+# Machine Learning Techniques 2022
+This repository contains all lectures and seminars for Machine Learning Techniques course taught in 2022 by Michal Kubišta on CERGE-EI.
 
-[Questions form](https://forms.gle/X6tV4gdHpd9Eh1BM7)  
-[Answers](https://tinyurl.com/y9cwg6g9)  
 
 Expected topics:
 
