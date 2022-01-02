@@ -52,9 +52,10 @@ map(prodTab, ~length(unique(.)))
     # we will not manage the duplicities to keep the the original
     # proportions
 
-prodTab[product_name %in% prodTab[duplicated(prodTab$product_name), unique(product_name)]
-        ] %>% 
-        {unique(.)}
+prodTab$product_name %>% 
+  duplicated() %>% 
+  prodTab[.,] %>% 
+  unique()
 
 # Define the injection function
     # to increase the number of variables to better feed our Bayes
@@ -71,8 +72,11 @@ inject = function(x) {
 ## splitting the product names
     # now let's apply the user-defined function over the rows of the table,
     # creating a new table and add the column names
-prodTab[, c("desc1", "desc2", "desc3") := inject(product_name),
-        by = product_name]
+
+prodTab[,
+        c("desc1", "desc2", "desc3") := inject(product_name),
+        by = product_name
+        ]
 prodTab
 
 ## all factors!

@@ -4,11 +4,17 @@
 ## 6 January 2021 ##
 ####################
 
-purrr::map(c("data.table","dplyr","magrittr","ggplot2"), ~require(.x, character.only = T))
+purrr::map_lgl(
+  c("data.table","dplyr","magrittr","ggplot2"), 
+  ~require(.x, character.only = T)
+)
 
-sapply(c("data.table","dplyr","magrittr","ggplot2"),
-       require,
-       character.only = T)
+sapply(
+  c("data.table","dplyr","magrittr","ggplot2"),
+  require,
+  character.only = T
+)
+
 path2data = "w1/data/seminar"
 
 if (!dir.exists(path2data)) {
@@ -49,7 +55,7 @@ if (!dir.exists(path2data)) {
 # rm(auction, g_write)
 #----
 
-auction_Names = function(){
+auction_Names = function() {
   files = list.files(path2data, full.names =  T)
   files = files[grep("auction_day",files)]
   return(files)
@@ -73,9 +79,9 @@ rm(input, inputTable, i)
 #---- 1.1.2. APPLY ------------------------------------------------------------
 
 input = lapply(auction_Names(), read.csv)
-input = purrr::map(auction_Names(), read.csv)
-
 inputTable = do.call(rbind.data.frame, input)
+
+inputTable = purrr::map_df(auction_Names(), read.csv)
 
 rm(input, inputTable)
 
@@ -135,96 +141,11 @@ inputTable2 = plyr::join_all(input)
 
 rm(input, inputTable, inputTable2, inFileNames)
 
-#--- 1.3 READING WITH COL.CLASSES ---------------------------------------------
-
-## data origin: https://www.kaggle.com/rtatman/universal-product-code-database/data
-## script used to create our data:
-# upc = data.table::fread(file.path(path2data,"upc_corpus.csv"))
-# 
-# numIndex = upc$ean %>% as.numeric() %>% is.na()
-# upc$ean[numIndex] = "0"
-# 
-# upcLength = nchar(upc$ean)
-# maxLength = max(upcLength)
-# 
-# # system.time({
-# #       for(i in seq_along(upc$ean)){
-# #             upc$ean[i] =
-# #
-# #                   paste0(
-# #                         stringr::str_dup("0",maxLength - upcLength[i]),
-# #                         upc$ean[i])
-# #
-# #
-# #             print(paste(i/nrow(upc),"%"))
-# #
-# #       }
-# # })
-# 
-# library(stringr)
-# library(purrr)
-# 
-# system.time({
-#      upc$ean =
-#          purrr::map2_chr(upc$ean, upcLength,
-#                          function(x,y) paste0(
-#                              stringr::str_dup("0", maxLength - y
-#                                               ),x)
-#          )
-# })
-# 
-# data.table::fwrite(upc, file.path(path2data, "upc.csv"))
-# 
-# rm(upc, upcLength, maxLength, numIndex)
-#----
-
-upc = data.table::fread(file.path(path2data, "upc.csv"))
-
-upc %>% head(1000) %>% View()
-upc[9740:9744,]
-
-upc = data.table::fread(file.path(path2data, "upc.csv"),
-                        colClasses = c("character", "character"))
-
-## or in case of large amount of columns
-upc = data.table::fread(file.path(path2data, "upc.csv"),
-                        colClasses = c(ean = "character"))
-
-rm(upc)
-
 #-- PART 2 - CLEANING TIPS & TRICKS ###########################################
 
 #--- 2.1 REGEX ----------------------------------------------------------------
-#---- 2.1.1 TO BE, OR NOT TO BE
-hamlet = readLines("http://www.gutenberg.org/files/1524/1524-0.txt", encoding = "UTF-8")
-hamlet[1:50]
 
-grep("hamlet.*prince.*denmark", hamlet[1:500], ignore.case = TRUE)
-
-hamlet = hamlet[-1:-78]
-
-hamlet = hamlet[-which(hamlet == "")]
-
-hamHead = hamlet[1:25]
-hamText = hamlet[26:length(hamlet)]
-rm(hamlet)
-
-sum(grepl("rosencrantz", hamText, ignore.case = TRUE))
-length(grep("rosencrantz", hamText, ignore.case = TRUE))
-
-finder = function(name){
-  a = length(grep(name, hamText, ignore.case = TRUE))
-  root = stringr::str_sub(name,1,nchar(name) - 3)
-  b = length(grep(root,hamText, ignore.case = TRUE))
-  return(c(a,b))
-}
-
-finder("hamlet")
-finder("claudius")
-
-rm(hamText, hamHead, finder)
-
-#---- 2.1.2 DATA & REGEX
+#---- 2.1.1 DATA & REGEX
 ## data origin: https://www.datazar.com/project/p9d520430-ab0a-4f26-a44a-39b08d0e41bb/overview
 
 unzip(
@@ -313,9 +234,12 @@ auction = data.table::fread(file.path(path2data,"auction.csv"),
 
 #--- 3.1 BASE R
 
-colSelect =
-  !colnames(auction) %in% c("auctionid","bidder","item")
-plot(auction[,colSelect])
+colSelect = !colnames(auction) %in% c("auctionid","bidder","item","auction_type")
+
+auction %>% 
+  complete.cases() %>% 
+  auction[.,colSelect] %>% 
+  plot()
 
 #--- 3.2 GGally
 
