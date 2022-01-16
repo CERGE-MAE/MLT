@@ -1,7 +1,7 @@
 ---
 title: "Lecture 2"
 author: "Michal Kubi&#353;ta"
-date: "13 January 2021"
+date: "17 January 2022"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -81,7 +81,7 @@ $$\frac{P(Y_{1}=y_{1}|X) * P(Y_{2}=y_{2}|X) * ... * P(Y_{n}=y_{n}|X)*P(X)}{P(Y)}
 ## Other issues
 - Laplace  estimator
     + ussually 1 (= counts)
-- discrete values
+- numerical values
 
 
 ## Conclusion
