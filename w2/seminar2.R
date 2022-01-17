@@ -86,7 +86,7 @@ set.seed(123)
 nrow(prodTab) %>% {sample(.,. * 0.50)} -> index
 train = prodTab[index,]
 test = prodTab[-index,]
-rm(index, inject)
+rm(index)
 
 #--- 1.2 LABELLING -------------------------------------------------------------
 if (!require("e1071")) {
@@ -140,7 +140,7 @@ rm(bayes, prodTab, test, train)
 ##--- 2.1.1 ETL ----------------------------------------------------------------
 download.file("http://fimi.ua.ac.be/data/retail.dat.gz", "w2/data/retail.dat.gz")
 
-transRaw = read_table("w2/data/retail.dat.gz")
+transRaw = read_csv("w2/data/retail.dat.gz")
 colnames(transRaw) = "items"
 transRaw %>% head(500) %>% View()
 
@@ -156,7 +156,7 @@ itemsUn = unique(items)
 ## item frequencies
 itemsFreq = 
     table(items) %>% 
-    as.tibble() %>% 
+    as_tibble() %>% 
     arrange(desc(n))
 
 summary(itemsFreq$n)
@@ -282,8 +282,12 @@ inspect(model)
 rules = cbind(labels = labels(model), model@quality)
 # "@" because S4 happened
 
-rules$lhs = gsub("=>.*","", rules$labels)
-rules$rhs = gsub(".*=>","", rules$labels)
+rules = 
+  rules %>% 
+  mutate(
+    lhs = gsub("=>.*","", labels),
+    rhs = gsub(".*=>","", labels)
+    ) %>% 
+  select(lhs, rhs, support, confidence, lift, count)
 
-rules = rules[,c("lhs","rhs","support","confidence","lift", "count")]
 View(rules)
