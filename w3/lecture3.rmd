@@ -16,7 +16,7 @@ set.seed(123)
 
 ## Structure
 1. Distance
-2. k-Nearest neighbourhood
+2. k-nearest neighbors
 3. Recommendation system
 
 # Distance
@@ -68,7 +68,7 @@ $$H(x,y) = \sum_{i=1}^{n} 1_{x_{i} \ne y_{i}}$$
 
 $$G(x,y) = \frac{1}{p} \sum_{n=1}^{p} \frac{|x_{n} - y_{n}|}{range(n)} $$
 
-# k-Nearest neighbourhoods
+# k-nearest neighbors
 
 ## What does it do?
 

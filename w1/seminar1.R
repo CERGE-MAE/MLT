@@ -56,9 +56,9 @@ if (!dir.exists(path2data)) {
 #----
 
 auction_Names = function() {
-  files = list.files(path2data, full.names =  T)
-  files = files[grep("auction_day",files)]
-  return(files)
+  return(
+    list.files(path2data, full.names =  T, pattern = "auction_day")
+  )
 }
 
 #---- 1.1.1 FOR LOOP ----------------------------------------------------------
