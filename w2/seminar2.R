@@ -1,21 +1,21 @@
 #####################
 ## Seminar 2       ##
 ## Michal Kubista  ##
-## 13 January 2021 ##
+## 17 January 2022 ##
 #####################
 
 install_and_load = function(name, char = T){
     if (!require(name, character.only = char)) {
         install.packages(name)
     }
-        require(name, character.only = char)
+    require(name, character.only = char)
 }
 
 sapply(
-      c("data.table","tidyverse","magrittr",
-        "arules","arulesViz","readxl"),
-      install_and_load
-      )
+    c("data.table","tidyverse","magrittr",
+      "arules","arulesViz","readxl"),
+    install_and_load
+)
 
 rm(install_and_load)
 
@@ -30,68 +30,58 @@ if (!dir.exists("w2/data")) {
 # https://drive.google.com/drive/folders/1ynL4HLsulRwqbv_L5djmmsRvuuNJKUbn?usp=sharing
 # into w2/data
 
-prodTab = fread("w2/data/prod_structure.csv")
+prodTab = read_csv2("w2/data/prod_structure.csv")
 
 ## The first data overview
 str(prodTab)
-    # everything looks fine, 2 character columns as expected.
-    # since the size is manageable, we can view the whole table.
+# everything looks fine, 2 character columns as expected.
+# since the size is manageable, we can view the whole table.
 View(prodTab)
-    # no surprises
+# no surprises
 
 ## Check the proportion of the categories and products
 table(prodTab$category_name)
 map(prodTab, ~length(unique(.)))
-    # there is a strong class inbalance, especially with
-    # Mineral waters = 315 products AND
-    # Juice =          446 products VERSUS
-    # Tonic =            9 products.
-    # overall, we have 8 categories and 843 products.
-    # since there are 1039 rows, there will be some duplicites
-    # since this is only a slice of the original data
-    # we will not manage the duplicities to keep the the original
-    # proportions
+# there is a strong class inbalance, especially with
+# Mineral waters = 315 products AND
+# Juice =          446 products VERSUS
+# Tonic =            9 products.
+# overall, we have 8 categories and 843 products.
+# since there are 1039 rows, there will be some duplicites
+# since this is only a slice of the original data
+# we will not manage the duplicities to keep the the original
+# proportions
+prodTab %>% 
+    pull(product_name) %>% 
+    duplicated() %>% 
+    prodTab[.,] %>% 
+    unique()
 
-prodTab$product_name %>% 
-  duplicated() %>% 
-  prodTab[.,] %>% 
-  unique()
+# Split the product names
+# to increase the number of variables to better feed our Bayes
+# classifier, we will split the product_names into three different
+# description columns
+prodTab =
+    prodTab %>% 
+    group_by(product_name, category_name) %>% 
+    summarise(prodlist = strsplit(product_name, " ")) %>% 
+    unnest_wider(prodlist) %>% 
+    rename("desc1" = "...1", "desc2" = "...2", "desc3" = "...3")
 
-# Define the injection function
-    # to increase the number of variables to better feed our Bayes
-    # classifier, we will split the product_names into three different
-    # description columns
-
-inject = function(x) {
-      x %>%
-        strsplit(split = " ") %>% 
-        unlist() %>% 
-        as.list()
-}
-
-## splitting the product names
-    # now let's apply the user-defined function over the rows of the table,
-    # creating a new table and add the column names
-
-prodTab[,
-        c("desc1", "desc2", "desc3") := inject(product_name),
-        by = product_name
-        ]
-prodTab
 
 ## all factors!
-    # change the column clases into factors
-    # as Bayes is not able to work with text data
+# change the column clases into factors
+# as Bayes is not able to work with text data
 prodTab = map_df(prodTab, as.factor)
 
-    # let's check the unique values in all columns
-    # we have most of the unique descriptions in the second and third column
+# let's check the unique values in all columns
+# we have most of the unique descriptions in the second and third column
 map(prodTab, ~length(unique(.)))
 
 ## train & test division
-    # because of the random splitting, we are setting the seed to ensure
-    # the reproducibilty, we split the data in half into the train and
-    # test data
+# because of the random splitting, we are setting the seed to ensure
+# the reproducibilty, we split the data in half into the train and
+# test data
 set.seed(123)
 nrow(prodTab) %>% {sample(.,. * 0.50)} -> index
 train = prodTab[index,]
@@ -110,32 +100,32 @@ bayes = naiveBayes(category_name ~ ., train, laplace = 1)
 # in-sample accuracy?
 train %>% 
     mutate(lab = predict(bayes, train)) %>% 
-    summarise(acc = sum(lab == category_name))
+    summarise(acc = sum(lab == category_name)/n())
 
 ## prediction
 test$lab = predict(bayes, test)
 
 ## changin the columns
-    # changing the column order for the purpose of interpretation and
-    # model performance assessment, putting the original and predicted
-    # labels next to each other
-    # the accuracy looks very well on the first peak
+# changing the column order for the purpose of interpretation and
+# model performance assessment, putting the original and predicted
+# labels next to each other
+# the accuracy looks very well on the first peak
 test = test[,c(1,6,2:5)]
 View(test)
 test$ok = test$category_name == test$lab
 
 ## accuracy statistics
-    # defining the accuracy statistics:
-    # overall accuracy = the overall accuracy is very good, 93,1 %
-    # confusion table = we see no large problems in the model
-    #                   there are just two labels that are systematically
-    #                   mispredicted (a very small ones); the categories with
-    #                   higher amount of observations have higher number of bad predictions,
-    #                   but there is no surprise in that either 
-sum(test$ok)/nrow(test) * 100
+# defining the accuracy statistics:
+# overall accuracy = the overall accuracy is very good, 93,1 %
+# confusion table = we see no large problems in the model
+#                   there are just two labels that are systematically
+#                   mispredicted (a very small ones); the categories with
+#                   higher amount of observations have higher number of bad predictions,
+#                   but there is no surprise in that either 
+sum(test$ok)/nrow(test)
 
 table(test$category_name, test$lab) %>% 
-    # print() %>% 
+    print() %>% 
     as.data.frame() %>% 
     group_by(Var1) %>% 
     summarise(ok = sum((Var1 == Var2)*Freq),
@@ -150,33 +140,32 @@ rm(bayes, prodTab, test, train)
 ##--- 2.1.1 ETL ----------------------------------------------------------------
 download.file("http://fimi.ua.ac.be/data/retail.dat.gz", "w2/data/retail.dat.gz")
 
-transRaw = read.delim("w2/data/retail.dat.gz",
-                stringsAsFactors = FALSE)
-
+transRaw = read_table("w2/data/retail.dat.gz")
 colnames(transRaw) = "items"
-
 transRaw %>% head(500) %>% View()
 
 ## find unique items
-strsplit(transRaw$items, split = " ") %>% 
-      unlist() -> items
+items = 
+    strsplit(transRaw$items, split = " ") %>% 
+    unlist()
 itemsUn = unique(items)
 
 ## this will not work :/
-mat = matrix(0, nrow(transRaw), length(itemsUn))
+# mat = matrix(0, nrow(transRaw), length(itemsUn))
 
 ## item frequencies
-table(items) %>% 
-      as.data.frame() %>% 
-      arrange(desc(Freq)) -> itemsFreq
+itemsFreq = 
+    table(items) %>% 
+    as.tibble() %>% 
+    arrange(desc(n))
 
-summary(itemsFreq$Freq)
+summary(itemsFreq$n)
+sum(itemsFreq$n > 100)
 
-sum(itemsFreq$Freq > 100)
-
-itemsFreq %>% 
-      filter(Freq > 100) %>%
-      .$items -> itemsCh
+itemsCh = 
+    itemsFreq %>% 
+    filter(n > 100) %>%
+    pull(items)
 
 ##____Since we will limit the support of the rules later in the training phase,
 ##____we can already omit some items. By omitting I mean excluding them
@@ -185,14 +174,14 @@ itemsFreq %>%
 rm(items, itemsUn, itemsFreq)
 
 inject = function(raw){
-      raw %>%
-            strsplit(split = " ") %>%
-            unlist() -> nonList
-      
-      index = itemsCh %in% nonList %>% which()
-      out = rep(0, length(itemsCh))
-      out[index] = 1
-      return(out)
+    raw %>%
+        strsplit(split = " ") %>%
+        unlist() -> nonList
+    
+    index = itemsCh %in% nonList %>% which()
+    out = rep(0, length(itemsCh))
+    out[index] = 1
+    return(out)
 }
 #
 
@@ -213,10 +202,9 @@ inject = function(raw){
 # })
 # rm(transMat2, i , index, non_list, timeFor, timeApply)
 # ----
-
 system.time({
-  transMat = t(sapply(transRaw$items, inject))
-  })
+    transMat = t(sapply(transRaw$items, inject))
+})
 
 colnames(transMat) = itemsCh
 rownames(transMat) = 1:nrow(transMat)
@@ -229,8 +217,9 @@ rm(transRaw, itemsCh, inject)
 ##--- 2.1.2 ASSOCIATIONS -------------------------------------------------------
 model = apriori(transMat, parameter = list(support = 0.01, confidence = 0.5))
 
-inspect(model) %>%
-      as.data.frame() -> ruleTab
+ruleTab = 
+    inspect(model) %>%
+    as.data.frame()
 
 plot(model)
 plot(model, engine = 'interactive')
@@ -251,37 +240,34 @@ download.file(url, "w2/data/online_retail.xlsx", mode = 'wb' )
 transRaw = read_xlsx("w2/data/online_retail.xlsx")
 str(transRaw)
 
-transRaw %<>% 
-      select(InvoiceNo, Description)
+transRaw =
+    transRaw %>% 
+    select(InvoiceNo, Description)
 
 ## create a product table
-prodUn = transRaw$Description %>% unique()
+prodTable = 
+    transRaw %>% 
+    summarise(Description = unique(Description)) %>% 
+    mutate(prodID = seq_len(n()))
 
-prodTable = cbind(Description = prodUn,
-                   prodID = seq_along(prodUn)) %>%
-      as.data.frame(stringsAsFactors = F)
-rm(prodUn)
-
-## create a transaction table 
-transUn = transRaw$InvoiceNo %>% unique()
-
-transTable =  cbind(InvoiceNo = transUn,
-                     transID = seq_along(transUn)) %>%
-      as.data.frame(stringsAsFactors = F)
-rm(transUn)
+## create a transaction table
+transTable = 
+    transRaw %>% 
+    summarise(InvoiceNo = unique(InvoiceNo)) %>% 
+    mutate(transID = seq_len(n()))
 
 ## bind to the original table
-transRaw %<>% 
-      right_join(prodTable, by = "Description") %>% 
-      right_join(transTable, by = "InvoiceNo")
+transRaw = 
+    transRaw %>% 
+    right_join(prodTable, by = "Description") %>% 
+    right_join(transTable, by = "InvoiceNo")
 
 ## IDs as numeric
-transRaw[,3:4] = apply(transRaw[,3:4],2,as.numeric)
+transRaw[,3:4] = apply(transRaw[,3:4], 2, as.numeric)
 
 ## create sparse matrix based on IDs
-
 transMat = sparseMatrix(j = transRaw$transID,
-                         i = transRaw$prodID)
+                        i = transRaw$prodID)
 
 
 rownames(transMat) = prodTable$Description
@@ -290,11 +276,11 @@ colnames(transMat) = transTable$InvoiceNo
 ##--- 2.2.2 ASSOCIATIONS -------------------------------------------------------
 model = apriori(transMat, parameter = list(support = 0.02, confidence = 0.25))
 
-model %>% inspect() %>% as.data.frame()
+inspect(model)
 
 ## extract data manually
 rules = cbind(labels = labels(model), model@quality)
-    # "@" because S4 happened
+# "@" because S4 happened
 
 rules$lhs = gsub("=>.*","", rules$labels)
 rules$rhs = gsub(".*=>","", rules$labels)
