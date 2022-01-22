@@ -123,7 +123,7 @@ library(ggplot2)
 - [check the repo](https://github.com/CERGE-MAE/MLT) (and watch it)
 
 - download the slides (sources)
-- should you find any mistke in the materials
+- should you find any mistake in the materials
     + suggest edit via pull request
 - submit done via [Github classroom](https://classroom.github.com/a/nKg_vuUj)
 
