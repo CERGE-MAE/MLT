@@ -1,7 +1,7 @@
 #####################
 ## Seminar 3       ##
 ## Michal Kubista  ##
-## 20 January 2021 ##
+## 24 January 2022 ##
 #####################
 
 path2data = "w3/data"
@@ -9,9 +9,6 @@ path2data = "w3/data"
 if (!dir.exists(path2data)) {
     dir.create(path2data, recursive = T)
 }
-
-setwd("w3/data")
-## very, very bad practise!
 
 library(tidyverse)
 
@@ -48,8 +45,13 @@ library(tidyverse)
 #########################################################################
 
 ## read input
-input = map(list.files(), read_csv)
-names(input) = list.files() %>% gsub(".csv","",.)
+input = map(
+    list.files(path2data, full.names = T),
+    read_csv
+    )
+names(input) =
+    list.files(path2data) %>%
+    gsub(".csv","",.)
 
 #--- 1.2 TAGS EXPLORATION -----------------------------------------------------
 tags = input$tags
@@ -174,7 +176,7 @@ movies =
     movies %>%
     left_join(genres, by = 'movieId')
 
-movies
+View(movies)
 
 rm(genres, split_genre)
 
@@ -232,7 +234,7 @@ rat547 =
 ## user's rating overview
 rat547 %>% summary()
 
-# ratings is not "uniform"
+# ratings are not "uniform"
 rat547 %>% 
     pull(rating) %>% 
     hist()
@@ -267,7 +269,7 @@ colnames(movies547)
 
 # Define rat and rec data.
 # rat - those with some rating
-# rec   - no rating ~ not seen, recommend some of these!
+# rec - no rating ~ not seen, recommend some of these!
 moviesRat = movies547 %>% filter(!is.na(class))
 moviesRec = movies547 %>% filter(is.na(class))
 
@@ -301,11 +303,18 @@ rm(result, moviesTrain, moviesTest, indexTrain, i)
 
 ##--- 2.3 RECOMMEND -----------------------------------------------------------
 
-# Last step: apply the classificator to test data
-moviesRec$new =
-    knn(moviesRat[,5:24], moviesRec[,5:24], moviesRat$class, k)
+# Last step: apply the classifier to test data
+moviesRec$new = 
+    knn(
+        moviesRat[,5:24],
+        moviesRec[,5:24],
+        moviesRat$class,
+        k
+        )
 
-movies547[,5:24] %>% map_dbl(mean) %>% .[order(., decreasing = T)]
+movies547[,5:24] %>%
+    map_dbl(mean) %>%
+    .[order(., decreasing = T)]
 
 moviesRec %>% 
     filter(new == 1) %>% 
@@ -321,11 +330,6 @@ rm(moviesRat, moviesRec, movies547, rat547, k)
 ##-- PART 3 - COLLABORATIVE FILTERING #########################################
 
 ##--- 3.1 - PREPARATIONS ------------------------------------------------------
-if (!require(tidyr)) {
-    install.packages("tidyr")
-    library(tidyr)
-}
-
 ratings[c(99041,99132),]
 ratings = ratings[-99132,]
 
@@ -341,7 +345,7 @@ rnames = ratM$movieId
 ratM$movieId = NULL
 
 # set it as matrix for later use
-ratM %<>% as.matrix()
+ratM = as.matrix(ratM)
 rownames(ratM) = rnames
 ratM[1:10, 1:10]
 
