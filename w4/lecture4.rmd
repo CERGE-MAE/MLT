@@ -1,7 +1,7 @@
 ---
 title: "Lecture 4"
 author: "Michal Kubi&#353;ta"
-date: "27 January 2021"
+date: "31 January 2022"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -35,9 +35,9 @@ set.seed(123)
 
 ## 
 - definition
-- Euclidean
+- euclidean
 - mixed data
-- Gower
+- gower
 
 # Clustering introduction
 
@@ -46,7 +46,7 @@ set.seed(123)
     - cluster your customers
     - cluster your products
 - unsupervised learning
-    - no learning the rules
+    - it doesn't learn any generalization
         - no predictions
     - classify without training
 - objective: internally homogenous and externally heterogenous groups
@@ -210,6 +210,7 @@ ggplot(clustList[[length(clustList)]], aes(x = a, y = b, color = as.factor(lab))
 - forget the clusters, find the appropriate centers
 - algorithm assumptions:
     - spherical data
+    - constant variance across variables
     - constant variance across variables
     - similar number of members
 - greedy algorithm
