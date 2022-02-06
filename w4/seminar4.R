@@ -12,7 +12,7 @@ install_and_load = function(name, char = T) {
 }
 
 sapply(
-    c("tidyverse", "magrittr", "GGally", "cluster"),
+    c("tidyverse", "magrittr", "GGally", "cluster", "dbscan"),
     install_and_load
 )
 
@@ -84,7 +84,9 @@ outIndex =
     View() %>%
     filter(n > 2) %>%
     # parameter!
-    pull(.)
+    rename("obs" = ".") %>% 
+    pull(obs) %>% 
+    as.numeric()
 
 wholeC = wholeLg[-outIndex,]
 rm(outIndex, detect_outliers)
@@ -173,4 +175,18 @@ wholeC %>%
       ))
 
 clusplot(wholeC[,-1:-2], groups , color = TRUE, 
+         shade = T, labels = 1, lines = 0)
+
+
+#--- 1.2 DBSCAN ----------------------------------------------------------------
+wholeC$clust = NULL
+
+dbscan::kNNdistplot(wholeC, 4)
+abline(h = 2.65, col = "orange")
+dModel = dbscan(wholeC, 2.65, 5)
+
+# all in one cluster
+dModel$cluster %>% table()
+
+clusplot(wholeC[,-1:-2], dModel$cluster, color = TRUE, 
          shade = T, labels = 1, lines = 0)
