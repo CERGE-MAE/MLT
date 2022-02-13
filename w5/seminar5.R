@@ -8,8 +8,7 @@
 # install.packages("rattle")
 
 sapply(
-    c("data.table","dplyr","magrittr","ggplot2",
-      "purrr", "GGally", "readxl", "rpart", "rattle"),
+    c("tidyverse","GGally", "readxl", "rpart", "rattle"),
     require, character.only = T
 )
 
@@ -151,7 +150,7 @@ ggplot(bas, aes(x = items, y = price)) +
     geom_smooth(method = "loess")
 
 ## basket promo share
-ggplot(bas %>% arrange(bas$promoC), aes(x = 1:nrow(bas), y = promoC)) +
+ggplot(bas %>% arrange(promoC), aes(x = 1:nrow(bas), y = promoC)) +
     geom_line()
 
 ### analyse the periodicity on nopromo baskets ####
@@ -307,7 +306,7 @@ prodStatsS =
 rownames(prodStatsS) = prodStats$prod_id
 
 cluster = hclust(dist(prodStatsS), method = "complete")
-# plot(cluster)
+plot(cluster)
 
 set.seed(123)
 res = rep(NA, 20)
