@@ -1,7 +1,7 @@
 ---
 title: "Lecture 7"
 author: "Michal Kubi&#353;ta"
-date: "24 February 2021"
+date: "21 February 2022"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -142,7 +142,7 @@ ggplot(en, aes(ex,ey)) +
     
 ```
 
-## Gini coefficient
+## Gini impurity
 - first we label the observation randomly
     - with regard to the original proportions in the data
 - we choose observation randomly

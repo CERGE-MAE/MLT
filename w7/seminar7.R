@@ -1,7 +1,7 @@
 ######################
 ## Seminar 7        ##
 ## Michal Kubista   ##
-## 24 February 2021 ##
+## 21 February 2022 ##
 ######################
 
 install_and_load = function(name, char = T) {
@@ -24,13 +24,15 @@ sapply(
 #-- PART 1 - CHURN ############################################################
 #--- 1.1 ETL -------------------------------------------------------------------
 # downloaded from https://www.kaggle.com/blastchar/telco-customer-churn
-telco = fread("w7/data/WA_Fn-UseC_-Telco-Customer-Churn.csv",
-              colClasses = c(rep("factor", 5),
-                             "numeric",
-                             rep("factor", 12),
-                             rep("numeric", 2),
-                             "factor")
-              )
+
+cts = rep("f", 21)
+cts[c(6,19,20)] = "d"
+cts = paste(cts, collapse = "")
+
+telco = read_csv(
+  "w7/data/WA_Fn-UseC_-Telco-Customer-Churn.csv",
+  col_types = cts
+)
 
 str(telco)
 summary(telco)
@@ -40,8 +42,8 @@ View(telco)
 set.seed(12345)
 
 index = sample(nrow(telco), size =  0.8 * nrow(telco))
-train = telco[index,] %>% as.data.frame()
-test = telco[-index,] %>% as.data.frame()
+train = telco[index,] %>% as_tibble()
+test = telco[-index,] %>% as_tibble()
 
 summary(train[,-1])
 summary(test[,-1])
@@ -68,17 +70,17 @@ tree_pruned = prune(tree, 0.00474577)
 fancyRpartPlot(tree_pruned)
 
 ## trees train accuracy
-pred = as.data.frame(predict(tree))
+pred = as_tibble(predict(tree))
 sum(ifelse(pred$No > 0.5, "No", "Yes") == train$Churn) / nrow(train)
 
-pred_prune = as.data.frame(predict(tree_pruned))
+pred_prune = as_tibble(predict(tree_pruned))
 sum(ifelse(pred_prune$No > 0.5, "No", "Yes") == train$Churn) / nrow(train)
 
 ## pruned tree test accuracy
-full = as.data.frame(predict(tree, test))
+full = as_tibble(predict(tree, test))
 sum(ifelse(full$No > 0.5, "No", "Yes") == test$Churn) / nrow(test)
 
-pruned = as.data.frame(predict(tree_pruned, test))
+pruned = as_tibble(predict(tree_pruned, test))
 test$pred = ifelse(pruned$No > 0.5, "No", "Yes")
 sum(test$Churn == test$pred)/nrow(test)
 
@@ -93,6 +95,8 @@ test$pred = NULL
 rf = randomForest(Churn ~ ., train[,-1])
 
 ## HEEEEELP!
+
+
 
 #---- 1.3.1 randomFOREST -------------------------------------------------------
 rf = randomForest(Churn ~ ., train[,-1], importance = TRUE, keep.inbag = TRUE)
@@ -117,22 +121,22 @@ rf_random <- train(Churn ~ ., data = train[,-1], method = "rf", metric = metric,
 print(rf_random)
 plot(rf_random)
 
-##---- 1.3.3 OPTIMISE randomFOREST ---------------------------------------------
-errors = c()
-for (i in 3:10) {
+##---- 1.3.3 OPTIMISE randomForest ---------------------------------------------
+acc = rep(0, 10)
+for (i in 1:10) {
     rf = randomForest(Churn ~ ., train[,-1], mtry = i, importance = TRUE,
                       keep.inbag = TRUE, ntrees = 2000)
     
-    errors[length(errors) + 1] = 
-        sum(rf$predicted == train$Churn)/nrow(train)
+    acc[i] = sum(rf$predicted == train$Churn)/nrow(train)
 }
-errors
-which.max(errors)
+acc
+which.max(acc)
 
 ## "best" forest visualisation
-rf = randomForest(Churn ~ ., train[,-1], mtry = 4, importance = TRUE,
+rf = randomForest(Churn ~ ., train[,-1], mtry = 2, importance = TRUE,
                   keep.inbag = T, ntrees = 2000)
 rf$importance
+varImpPlot(rf)
 
 ff <- forestFloor(rf, train[,-1], binary_reg = T)
 plot(ff, col = fcol(ff, 1), plot_seq = 1:6)
