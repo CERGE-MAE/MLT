@@ -1,7 +1,7 @@
 ---
 title: "Lecture 6"
 author: "Michal Kubi&#353;ta"
-date: "10 February 2021"
+date: "14 February 2022"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -65,7 +65,7 @@ $ln Q = \alpha + \beta_{0} \ln P_{0} + \beta_{1} \ln P_{1} + \cdots + \beta_{n} 
 
 ## Much ado about elasticities?
 - elasticity coefficient
-    - revenues development in price change
+    - revenue development in price change
     - determines price change desirability
     - insufficient on it's own
 - adding price index

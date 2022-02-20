@@ -49,6 +49,7 @@ input = map(
     list.files(path2data, full.names = T),
     read_csv
     )
+
 names(input) =
     list.files(path2data) %>%
     gsub(".csv","",.)
@@ -245,7 +246,7 @@ ggplot(rat547, aes(x = timestamp, y = rating)) +
     geom_smooth(method = "loess")
 
 ## choose threshold
-## this is a parametr!!!
+## this is a parameter!!!
     ## it's choice needs discussion
 rat547 = 
     rat547 %>% 
@@ -292,7 +293,7 @@ for (i in 1:10) {
     print(result[i])
 }
 
-plot(1:i, result, type = "l")
+plot(1:i, result, type = "b")
 
 # Choose "k" to maximize prediction quality
 k = which.max(result)
@@ -389,7 +390,7 @@ no1 =
     {names(bestPicks)[.]}
 
 movies %>% 
-    filter(movieId == no1)
+    filter(movieId == no1) %>% View()
 
 movies %>%
     filter(movieId %in% userMov) %>% 
@@ -425,7 +426,7 @@ bestPicks
 index = which.max(cumsum(bestPicks) >= 10)
 
 userSim = 
-    user[userID,][user[userID,] >= names(index)] %>%
+    user[userID,][user[userID,] >= as.numeric(names(index))] %>%
     names()
 
 ## movies watched by similar users 
