@@ -61,7 +61,7 @@ elas_table =
   mutate(
     elasG = cut(
       elas,
-      breaks = c(-14, -2, -1, 0),
+      breaks = c(-Inf, -2, -1, 0),
       labels = c("H", "M", "L")
       )
   )
