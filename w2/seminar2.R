@@ -42,7 +42,7 @@ View(prodTab)
 ## Check the proportion of the categories and products
 table(prodTab$category_name)
 map(prodTab, ~length(unique(.)))
-# there is a strong class inbalance, especially with
+# there is a strong class imbalance, especially with
 # Mineral waters = 315 products AND
 # Juice =          446 products VERSUS
 # Tonic =            9 products.
@@ -55,7 +55,7 @@ prodTab %>%
     pull(product_name) %>% 
     duplicated() %>% 
     prodTab[.,] %>% 
-    unique()
+    unique() %>% View()
 
 # Split the product names
 # to increase the number of variables to better feed our Bayes
@@ -67,7 +67,6 @@ prodTab =
     summarise(prodlist = strsplit(product_name, " ")) %>% 
     unnest_wider(prodlist) %>% 
     rename("desc1" = "...1", "desc2" = "...2", "desc3" = "...3")
-
 
 ## all factors!
 # change the column clases into factors
@@ -83,7 +82,7 @@ map(prodTab, ~length(unique(.)))
 # the reproducibilty, we split the data in half into the train and
 # test data
 set.seed(123)
-nrow(prodTab) %>% {sample(.,. * 0.50)} -> index
+index = sample(nrow(prodTab), nrow(prodTab) * 0.50)
 train = prodTab[index,]
 test = prodTab[-index,]
 rm(index)
@@ -173,10 +172,11 @@ itemsCh =
 ##____transactions). 
 rm(items, itemsUn, itemsFreq)
 
-inject = function(raw){
+inject = function(raw) {
+  nonList = 
     raw %>%
-        strsplit(split = " ") %>%
-        unlist() -> nonList
+    strsplit(split = " ") %>%
+    unlist()
     
     index = itemsCh %in% nonList %>% which()
     out = rep(0, length(itemsCh))
@@ -259,8 +259,8 @@ transTable =
 ## bind to the original table
 transRaw = 
     transRaw %>% 
-    right_join(prodTable, by = "Description") %>% 
-    right_join(transTable, by = "InvoiceNo")
+    inner_join(prodTable, by = "Description") %>% 
+    inner_join(transTable, by = "InvoiceNo")
 
 ## IDs as numeric
 transRaw[,3:4] = apply(transRaw[,3:4], 2, as.numeric)
