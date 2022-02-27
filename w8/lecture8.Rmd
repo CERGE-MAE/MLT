@@ -1,7 +1,7 @@
 ---
 title: "Lecture 8"
 author: "Michal Kubi&#353;ta"
-date: "2 March 2020"
+date: "28 February 2022"
 output:
   ioslides_presentation:
     widescreen: yes

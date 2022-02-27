@@ -48,8 +48,11 @@ server <- function(input, output) {
    })
    
    output$time = reactive({
-       paste0("Analysis of ", input$x, " and ", input$y, " started at ", Sys.time(),
-             ". Maximum value of variable ", input$x, " is ", max(mtcars[,input$x]), " initial limit was ", isolate(input$xlim), ".")
+       paste0("Analysis of ", input$x, " and ", input$y,
+              " started at ", Sys.time(),
+              ". Maximum value of variable ", input$x, " is ",
+              max(mtcars[,input$x]), " initial limit was ",
+              isolate(input$xlim), ".")
        #isolate
    })
    
